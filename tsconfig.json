@@ -1,0 +1,20 @@
+{
+  "include": ["src/**/*"],
+  "exclude": [],
+  "compilerOptions": {
+    "target": "es2020",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "rootDir": ".",
+    "allowJs": true,
+    "declaration": true,
+    "declarationMap": true,
+    "outDir": "dist",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "skipLibCheck": true
+  }
+}
