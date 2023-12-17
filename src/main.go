@@ -1,8 +1,8 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
+	"strings"
 	"syscall/js"
 
 	"libdb.so/scouts-server/scouts"
@@ -13,6 +13,7 @@ var game *scouts.Game
 func main() {
 	js.Global().Set("Scouts", map[string]any{
 		"resetGame":     promisify(resetGame),
+		"boardPieces":   promisify(boardPieces),
 		"makeMove":      promisify(makeMove),
 		"possibleMoves": promisify(possibleMoves),
 	})
@@ -20,15 +21,33 @@ func main() {
 	select {}
 }
 
-// async makeMove(player: number, move: { type: string, move: any })
-// async possibleMoves(player: number): Record<string, any>
-
 func resetGame(this js.Value, args []js.Value) (js.Value, error) {
+	if len(args) != 0 {
+		return js.Undefined(), fmt.Errorf("resetGame: expected 0 arguments, got %d", len(args))
+	}
+
 	game = scouts.NewGame()
 	return js.Undefined(), nil
 }
 
+func boardPieces(this js.Value, args []js.Value) (js.Value, error) {
+	if len(args) != 0 {
+		return js.Undefined(), fmt.Errorf("boardPieces: expected 0 arguments, got %d", len(args))
+	}
+
+	if game == nil {
+		return js.Undefined(), fmt.Errorf("game is not initialized")
+	}
+
+	pieces := game.Board().Pieces()
+	return encodeObject(pieces)
+}
+
 func makeMove(this js.Value, args []js.Value) (js.Value, error) {
+	if len(args) != 2 {
+		return js.Undefined(), fmt.Errorf("makeMove: expected 2 arguments, got %d", len(args))
+	}
+
 	if game == nil {
 		return js.Undefined(), fmt.Errorf("game is not initialized")
 	}
@@ -38,7 +57,7 @@ func makeMove(this js.Value, args []js.Value) (js.Value, error) {
 		return js.Undefined(), fmt.Errorf("invalid player: %w", err)
 	}
 
-	move, err := unmarshalMove(objectToJSON(args[1]))
+	move, err := unmarshalMove(args[1].String())
 	if err != nil {
 		return js.Undefined(), fmt.Errorf("cannot unmarshal move JSON: %w", err)
 	}
@@ -51,6 +70,10 @@ func makeMove(this js.Value, args []js.Value) (js.Value, error) {
 }
 
 func possibleMoves(this js.Value, args []js.Value) (js.Value, error) {
+	if len(args) != 1 {
+		return js.Undefined(), fmt.Errorf("possibleMoves: expected 1 argument, got %d", len(args))
+	}
+
 	if game == nil {
 		return js.Undefined(), fmt.Errorf("game is not initialized")
 	}
@@ -64,34 +87,25 @@ func possibleMoves(this js.Value, args []js.Value) (js.Value, error) {
 	return encodeObject(moves)
 }
 
-func unmarshalMove(jsonData []byte) (scouts.Move, error) {
-	var moveHeader struct {
-		Type scouts.MoveType `json:"type"`
-		Move json.RawMessage `json:"move"`
-	}
-	if err := json.Unmarshal(jsonData, &moveHeader); err != nil {
-		return nil, err
-	}
-
+func unmarshalMove(moveString string) (scouts.Move, error) {
 	var move scouts.Move
-	switch moveHeader.Type {
-	case scouts.BoulderMoveType:
+	switch {
+	case strings.HasPrefix(moveString, string(scouts.BoulderMoveType)):
 		move = &scouts.BoulderMove{}
-	case scouts.DashMoveType:
+	case strings.HasPrefix(moveString, string(scouts.DashMoveType)):
 		move = &scouts.DashMove{}
-	case scouts.JumpMoveType:
+	case strings.HasPrefix(moveString, string(scouts.JumpMoveType)):
 		move = &scouts.JumpMove{}
-	case scouts.PlaceScoutMoveType:
+	case strings.HasPrefix(moveString, string(scouts.PlaceScoutMoveType)):
 		move = &scouts.PlaceScoutMove{}
-	case scouts.SkipMoveType:
-		move = &scouts.SkipMove{}
+	case strings.HasPrefix(moveString, string(scouts.SkipMoveType)):
+		return &scouts.SkipMove{}, nil
 	default:
-		return nil, fmt.Errorf("unknown move type: %v", moveHeader.Type)
+		return nil, fmt.Errorf("unknown move %q", moveString)
 	}
 
-	if err := json.Unmarshal(moveHeader.Move, move); err != nil {
-		return nil, err
+	if err := move.UnmarshalText([]byte(moveString)); err != nil {
+		return nil, fmt.Errorf("cannot unmarshal move %s: %w", moveString, err)
 	}
-
 	return move, nil
 }

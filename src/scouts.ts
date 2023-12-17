@@ -9,6 +9,8 @@ declare global {
   interface Scouts {
     // resetGame resets the game to the initial state.
     resetGame(): Promise<void>;
+    // boardPieces returns the pieces on the board.
+    boardPieces(): Promise<Piece[]>;
     // makeMove makes a move for the player. If the move is invalid, an error is
     // thrown.
     makeMove(player: Player, move: Move): Promise<void>;
@@ -21,42 +23,15 @@ declare global {
 export type Player = 1 | 2;
 
 // Point is a point on the board. The origin is the top left corner.
-export type Point = {
-  X: number;
-  Y: number;
-};
+export type Point = `${number},${number}`;
 
 // Move is a move that a player can make.
 export type Move =
-  | {
-      type: "boulder";
-      move: {
-        top_left: Point;
-      };
-    }
-  | {
-      type: "dash";
-      move: {
-        scout_position: Point;
-        destination: Point;
-      };
-    }
-  | {
-      type: "jump";
-      move: {
-        scout_position: Point;
-        destination: Point;
-      };
-    }
-  | {
-      type: "place_scout";
-      move: {
-        scout_position: Point;
-      };
-    }
-  | {
-      type: "skip";
-    };
+  | `boulder ${Point}`
+  | `dash ${Point} ${Point}`
+  | `jump ${Point} ${Point}`
+  | `place_scout ${Point}`
+  | "skip";
 
 export type PossibleMoves = {
   // moves is a list of possible moves. It never contains BoulderMove, since
@@ -67,6 +42,20 @@ export type PossibleMoves = {
   // It provides no indication of where the boulder can be placed.
   can_place_boulder: boolean;
 };
+
+// Piece is a piece on the board.
+export type Piece =
+  | {
+      kind: "scout";
+      player: Player;
+      position: [Point];
+      returning: boolean;
+    }
+  | {
+      kind: "boulder";
+      player: Player;
+      position: [Point, Point, Point, Point];
+    };
 
 function waitForScouts(): Promise<void> {
   return new Promise<void>((resolve) => {
