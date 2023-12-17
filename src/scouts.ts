@@ -48,7 +48,7 @@ export type Piece =
   | {
       kind: "scout";
       player: Player;
-      position: [Point];
+      position: Point;
       returning: boolean;
     }
   | {
