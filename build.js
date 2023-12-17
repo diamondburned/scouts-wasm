@@ -11,7 +11,16 @@ async function main() {
   await fs.mkdir(outDir, { recursive: true });
 
   // Download wasm_exec.js
-  const wasmExec = await fetch(wasmExecURL);
+  let ifModifiedSince = null;
+  if (await fs.stat(`${outDir}/wasm_exec.js`).catch(() => null)) {
+    ifModifiedSince = (await fs.stat(`${outDir}/wasm_exec.js`)).mtime.toUTCString();
+  }
+  const wasmExec = await fetch(wasmExecURL, {
+    headers: ifModifiedSince ? { "If-Modified-Since": ifModifiedSince } : {},
+  });
+  if (!wasmExec.ok) {
+    throw new Error(`failed to download wasm_exec.js: ${wasmExec.status} ${wasmExec.statusText}`);
+  }
   await fs.writeFile(`${outDir}/wasm_exec.js`, await wasmExec.text());
 
   // Build main.wasm

@@ -3,6 +3,7 @@ import "../dist/wasm_exec.js";
 declare global {
   interface Window {
     Go: any;
+    Scouts: Scouts;
   }
 
   interface Scouts {
@@ -67,6 +68,17 @@ export type PossibleMoves = {
   can_place_boulder: boolean;
 };
 
+function waitForScouts(): Promise<void> {
+  return new Promise<void>((resolve) => {
+    const interval = setInterval(() => {
+      if (window["Scouts"]) {
+        clearInterval(interval);
+        resolve();
+      }
+    }, 100);
+  });
+}
+
 export async function load(wasmPath: string): Promise<void> {
   if (!window.Go) {
     throw new Error("wasm_exec.js could not be loaded.");
@@ -74,15 +86,23 @@ export async function load(wasmPath: string): Promise<void> {
 
   const go = new window.Go();
   let wasm: WebAssembly.Instance;
+  let runPromise: Promise<void>;
 
   if ("instantiateStreaming" in WebAssembly) {
     const obj = await WebAssembly.instantiateStreaming(fetch(wasmPath), go.importObject);
     wasm = obj.instance;
-    go.run(wasm);
+    runPromise = go.run(wasm);
   } else {
     const wasmBytes = await fetch(wasmPath).then((resp) => resp.arrayBuffer());
     const obj = await WebAssembly.instantiate(wasmBytes, go.importObject);
     wasm = obj.instance;
-    go.run(wasm);
+    runPromise = go.run(wasm);
   }
+
+  runPromise = runPromise.catch((err) => {
+    console.error(err);
+    throw err;
+  });
+
+  await Promise.race([runPromise, waitForScouts()]);
 }

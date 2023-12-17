@@ -11,12 +11,13 @@ import (
 var game *scouts.Game
 
 func main() {
-	namespace := js.ValueOf(map[string]any{
+	js.Global().Set("Scouts", map[string]any{
 		"resetGame":     promisify(resetGame),
 		"makeMove":      promisify(makeMove),
 		"possibleMoves": promisify(possibleMoves),
 	})
-	js.Global().Set("Scouts", namespace)
+	// Block forever
+	select {}
 }
 
 // async makeMove(player: number, move: { type: string, move: any })
@@ -28,6 +29,10 @@ func resetGame(this js.Value, args []js.Value) (js.Value, error) {
 }
 
 func makeMove(this js.Value, args []js.Value) (js.Value, error) {
+	if game == nil {
+		return js.Undefined(), fmt.Errorf("game is not initialized")
+	}
+
 	player := scouts.Player(args[0].Int())
 	if err := player.Validate(); err != nil {
 		return js.Undefined(), fmt.Errorf("invalid player: %w", err)
@@ -46,6 +51,10 @@ func makeMove(this js.Value, args []js.Value) (js.Value, error) {
 }
 
 func possibleMoves(this js.Value, args []js.Value) (js.Value, error) {
+	if game == nil {
+		return js.Undefined(), fmt.Errorf("game is not initialized")
+	}
+
 	player := scouts.Player(args[0].Int())
 	if err := player.Validate(); err != nil {
 		return js.Undefined(), fmt.Errorf("invalid player: %w", err)

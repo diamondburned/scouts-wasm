@@ -2,16 +2,30 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
+	"log"
+	"runtime/debug"
 	"syscall/js"
 )
 
 func promisify(fn func(js.Value, []js.Value) (js.Value, error)) js.Func {
 	return js.FuncOf(func(this js.Value, args []js.Value) any {
+		log.Println("constructing promise")
+
 		handler := js.FuncOf(func(this js.Value, args []js.Value) any {
 			resolve := args[0]
 			reject := args[1]
 			go func() {
+				defer func() {
+					if err := recover(); err != nil {
+						jsError := js.Global().Get("Error").New(fmt.Sprintf(
+							"panic occured: %v\nstack: %s", err, string(debug.Stack()),
+						))
+						reject.Invoke(jsError)
+					}
+				}()
 				result, err := fn(this, args)
+				log.Println("promise resolved:", result, err)
 				if err != nil {
 					jsError := js.Global().Get("Error").New(err.Error())
 					reject.Invoke(jsError)
@@ -22,8 +36,7 @@ func promisify(fn func(js.Value, []js.Value) (js.Value, error)) js.Func {
 			return nil
 		})
 
-		jsPromise := js.Global().Get("Promise").New(handler)
-		return jsPromise
+		return js.Global().Get("Promise").New(handler)
 	})
 }
 
