@@ -13,6 +13,8 @@ declare global {
     boardPieces(): Promise<Piece[]>;
     // pastTurns returns the past turns.
     pastTurns(): Promise<PastTurn[]>;
+    // currentTurn returns the current turn.
+    currentTurn(): Promise<CurrentTurn>;
     // makeMove makes a move for the player. If the move is invalid, an error is
     // thrown.
     makeMove(player: Player, move: Move): Promise<void>;
@@ -53,6 +55,9 @@ export type PastTurn = {
   // moves is the moves that the player made.
   moves: Move[];
 };
+
+// CurrentTurn is the current turn.
+export type CurrentTurn = PastTurn & { plays: number };
 
 // Piece is a piece on the board.
 export type Piece =

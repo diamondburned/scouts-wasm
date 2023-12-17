@@ -15,6 +15,7 @@ func main() {
 		"resetGame":     promisify(resetGame),
 		"boardPieces":   promisify(boardPieces),
 		"pastTurns":     promisify(pastTurns),
+		"currentTurn":   promisify(currentTurn),
 		"makeMove":      promisify(makeMove),
 		"possibleMoves": promisify(possibleMoves),
 	})
@@ -52,7 +53,34 @@ func pastTurns(this js.Value, args []js.Value) (js.Value, error) {
 		return js.Undefined(), fmt.Errorf("game is not initialized")
 	}
 
-	return encodeObject(game.PastTurns())
+	type pastTurn struct {
+		Moves  []scouts.Move `json:"moves"`
+		Player scouts.Player `json:"player"`
+	}
+	pastTurns_ := game.PastTurns()
+	pastTurns := make([]pastTurn, len(pastTurns_))
+	for i, turn := range pastTurns_ {
+		pastTurns[i] = pastTurn(turn)
+	}
+
+	return encodeObject(pastTurns)
+}
+
+func currentTurn(this js.Value, args []js.Value) (js.Value, error) {
+	if len(args) != 0 {
+		return js.Undefined(), fmt.Errorf("currentTurn: expected 0 arguments, got %d", len(args))
+	}
+
+	if game == nil {
+		return js.Undefined(), fmt.Errorf("game is not initialized")
+	}
+
+	type currentTurn struct {
+		Moves  []scouts.Move `json:"moves"`
+		Plays  int           `json:"plays"`
+		Player scouts.Player `json:"player"`
+	}
+	return encodeObject(currentTurn(game.CurrentTurn()))
 }
 
 func makeMove(this js.Value, args []js.Value) (js.Value, error) {
