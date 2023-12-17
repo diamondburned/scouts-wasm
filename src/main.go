@@ -14,6 +14,7 @@ func main() {
 	js.Global().Set("Scouts", map[string]any{
 		"resetGame":     promisify(resetGame),
 		"boardPieces":   promisify(boardPieces),
+		"pastTurns":     promisify(pastTurns),
 		"makeMove":      promisify(makeMove),
 		"possibleMoves": promisify(possibleMoves),
 	})
@@ -39,8 +40,19 @@ func boardPieces(this js.Value, args []js.Value) (js.Value, error) {
 		return js.Undefined(), fmt.Errorf("game is not initialized")
 	}
 
-	pieces := game.Board().Pieces()
-	return encodeObject(pieces)
+	return encodeObject(game.Board().Pieces())
+}
+
+func pastTurns(this js.Value, args []js.Value) (js.Value, error) {
+	if len(args) != 0 {
+		return js.Undefined(), fmt.Errorf("pastMoves: expected 0 arguments, got %d", len(args))
+	}
+
+	if game == nil {
+		return js.Undefined(), fmt.Errorf("game is not initialized")
+	}
+
+	return encodeObject(game.PastTurns())
 }
 
 func makeMove(this js.Value, args []js.Value) (js.Value, error) {

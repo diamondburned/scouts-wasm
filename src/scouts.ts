@@ -11,6 +11,8 @@ declare global {
     resetGame(): Promise<void>;
     // boardPieces returns the pieces on the board.
     boardPieces(): Promise<Piece[]>;
+    // pastTurns returns the past turns.
+    pastTurns(): Promise<PastTurn[]>;
     // makeMove makes a move for the player. If the move is invalid, an error is
     // thrown.
     makeMove(player: Player, move: Move): Promise<void>;
@@ -33,6 +35,7 @@ export type Move =
   | `place_scout ${Point}`
   | "skip";
 
+// PossibleMoves is the possible moves for a player.
 export type PossibleMoves = {
   // moves is a list of possible moves. It never contains BoulderMove, since
   // that's a special case that's determined through the CanPlaceBoulder
@@ -41,6 +44,14 @@ export type PossibleMoves = {
   // can_place_boulder is true if the player can place a boulder.
   // It provides no indication of where the boulder can be placed.
   can_place_boulder: boolean;
+};
+
+// PastTurn is a past turn.
+export type PastTurn = {
+  // player is the player that made the move.
+  player: Player;
+  // moves is the moves that the player made.
+  moves: Move[];
 };
 
 // Piece is a piece on the board.
@@ -68,6 +79,8 @@ function waitForScouts(): Promise<void> {
   });
 }
 
+// load loads the scouts wasm module. For more information on the module, see
+// the README.
 export async function load(wasmPath: string): Promise<void> {
   if (!window.Go) {
     throw new Error("wasm_exec.js could not be loaded.");
