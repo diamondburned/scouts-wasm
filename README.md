@@ -14,7 +14,7 @@ npm i diamondburned/scouts-wasm#dist
 
 ```ts
 import { load } from "scouts-wasm";
-import wasmURL from "scouts-wasm/dist/scouts.wasm?url";
+import wasmURL from "scouts-wasm/dist/main.wasm?url";
 
 await load(wasmURL);
 
