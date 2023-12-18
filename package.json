@@ -9,10 +9,10 @@
   },
   "main": "dist/scouts.js",
   "types": "dist/scouts.d.ts",
-  "exports": {
-    ".": "./dist/scouts.js"
-  },
-  "author": "",
+  "files": [
+    "dist"
+  ],
+  "author": "diamondburned",
   "license": "ISC",
   "devDependencies": {
     "pkgroll": "^2.0.1",

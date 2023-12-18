@@ -4,18 +4,19 @@ import * as fs from "fs/promises";
 import * as child_process from "child_process";
 
 const outDir = "dist";
+const outWasm = `${outDir}/main.wasm`;
 const buildProfile = "tinygo";
 
 const buildProfiles = {
   tinygo: {
     wasmExecURL: "https://raw.githubusercontent.com/tinygo-org/tinygo/release/targets/wasm_exec.js",
-    buildCmd: ["tinygo", "build", "-o", `${outDir}/scouts.wasm`, "-target", "wasm", "./src"],
+    buildCmd: ["tinygo", "build", "-o", outWasm, "-target", "wasm", "./src"],
     buildEnv: {},
   },
   go: {
     wasmExecURL:
       "https://raw.githubusercontent.com/golang/go/release-branch.go1.21/misc/wasm/wasm_exec.js",
-    buildCmd: ["go", "build", "-o", `${outDir}/scouts.wasm`, "./src"],
+    buildCmd: ["go", "build", "-o", outWasm, "./src"],
     buildEnv: { GOOS: "js", GOARCH: "wasm" },
   },
 };
@@ -33,10 +34,13 @@ async function main() {
   const wasmExec = await fetch(wasmExecURL, {
     headers: ifModifiedSince ? { "If-Modified-Since": ifModifiedSince } : {},
   });
-  if (!wasmExec.ok) {
+  if (wasmExec.status === 304) {
+    console.log("wasm_exec.js is up to date");
+  } else if (wasmExec.ok) {
+    await fs.writeFile(`${outDir}/wasm_exec.js`, await wasmExec.text());
+  } else {
     throw new Error(`failed to download wasm_exec.js: ${wasmExec.status} ${wasmExec.statusText}`);
   }
-  await fs.writeFile(`${outDir}/wasm_exec.js`, await wasmExec.text());
 
   // Build main.wasm
   await exec(buildCmd, buildEnv);
