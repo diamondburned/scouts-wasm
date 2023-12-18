@@ -4,3 +4,5 @@ libdb.so/scouts-server v0.0.0-20231216141957-cae8d03fa425 h1:oa1ajU2XGuV9VAHibWI
 libdb.so/scouts-server v0.0.0-20231216141957-cae8d03fa425/go.mod h1:fATJwW4DqJaskR9c3xL8MB9OnBBKeZsvqzQ0jd/JsHM=
 libdb.so/scouts-server v0.0.0-20231217144238-f56459d69e9e h1:lFPVqBcPhcmqaI1Q7H7sBTq2yMJ9tEvclG+s3ePe3qk=
 libdb.so/scouts-server v0.0.0-20231217144238-f56459d69e9e/go.mod h1:fATJwW4DqJaskR9c3xL8MB9OnBBKeZsvqzQ0jd/JsHM=
+libdb.so/scouts-server v0.0.0-20231218082506-35523f857b22 h1:Z09Aj+W8VdgTDk5Qcikl9CFmrHzutkYmbs0ZveP29b4=
+libdb.so/scouts-server v0.0.0-20231218082506-35523f857b22/go.mod h1:fATJwW4DqJaskR9c3xL8MB9OnBBKeZsvqzQ0jd/JsHM=

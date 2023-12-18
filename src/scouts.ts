@@ -28,14 +28,14 @@ declare global {
 export type Player = 1 | 2;
 
 // Point is a point on the board. The origin is the top left corner.
-export type Point = `${number},${number}`;
+export type Point = [number, number];
 
 // Move is a move that a player can make.
 export type Move =
-  | `boulder ${Point}`
-  | `dash ${Point} ${Point}`
-  | `jump ${Point} ${Point}`
-  | `place_scout ${Point}`
+  | `boulder ${number},${number}`
+  | `dash ${number},${number} ${number},${number}`
+  | `jump ${number},${number} ${number},${number}`
+  | `place_scout ${number},${number}`
   | "skip";
 
 // PossibleMoves is the possible moves for a player.
