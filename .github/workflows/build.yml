@@ -22,7 +22,7 @@ jobs:
           shell-file: shell.nix
 
       - name: Build
-        run: ./build.js
+        run: npm i && ./build.js
 
       - name: Upload dist artifact
         uses: actions/upload-artifact@v2
