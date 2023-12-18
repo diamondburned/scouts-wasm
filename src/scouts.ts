@@ -3,23 +3,21 @@ import "../dist/wasm_exec.js";
 declare global {
   interface Window {
     Go: any;
-    Scouts: Scouts;
-  }
-
-  interface Scouts {
-    // resetGame resets the game to the initial state.
-    resetGame(): Promise<void>;
-    // boardPieces returns the pieces on the board.
-    boardPieces(): Promise<Piece[]>;
-    // pastTurns returns the past turns.
-    pastTurns(): Promise<PastTurn[]>;
-    // currentTurn returns the current turn.
-    currentTurn(): Promise<CurrentTurn>;
-    // makeMove makes a move for the player. If the move is invalid, an error is
-    // thrown.
-    makeMove(player: Player, move: Move): Promise<void>;
-    // possibleMoves returns the possible moves for the player.
-    possibleMoves(player: Player): Promise<PossibleMoves>;
+    Scouts: {
+      // resetGame resets the game to the initial state.
+      resetGame(): Promise<void>;
+      // boardPieces returns the pieces on the board.
+      boardPieces(): Promise<Piece[]>;
+      // pastTurns returns the past turns.
+      pastTurns(): Promise<PastTurn[]>;
+      // currentTurn returns the current turn.
+      currentTurn(): Promise<CurrentTurn>;
+      // makeMove makes a move for the player. If the move is invalid, an error is
+      // thrown.
+      makeMove(player: Player, move: Move): Promise<void>;
+      // possibleMoves returns the possible moves for the player.
+      possibleMoves(player: Player): Promise<PossibleMoves>;
+    };
   }
 }
 
