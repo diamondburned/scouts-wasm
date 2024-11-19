@@ -1,28 +1,51 @@
 import "../dist/wasm_exec.js";
 
-interface Game {
-  // resetGame resets the game to the initial state.
-  resetGame(): Promise<void>;
-  // boardPieces returns the pieces on the board.
-  boardPieces(): Promise<Piece[]>;
-  // pastTurns returns the past turns.
-  pastTurns(): Promise<PastTurn[]>;
-  // currentTurn returns the current turn.
-  currentTurn(): Promise<CurrentTurn>;
-  // makeMove makes a move for the player. If the move is invalid, an error is
-  // thrown.
-  makeMove(player: Player, move: Move): Promise<void>;
-  // possibleMoves returns the possible moves for the player.
-  possibleMoves(player: Player): Promise<PossibleMoves>;
-}
+type wasmReturn<T> = [T, undefined | Error];
 
 declare global {
   interface Window {
     Go: any;
-    Scouts: Game;
+    __Scouts: {
+      resetGame(): wasmReturn<void>;
+      boardPieces(): wasmReturn<Piece[]>;
+      pastTurns(): wasmReturn<PastTurn[]>;
+      currentTurn(): wasmReturn<CurrentTurn>;
+      makeMove(player: Player, move: Move): wasmReturn<void>;
+      possibleMoves(player: Player): wasmReturn<PossibleMoves>;
+    };
   }
-  const Scouts: Game;
 }
+
+function unwrapCall<T extends (...args: any[]) => wasmReturn<any>>(
+  fn: T,
+  ...args: Parameters<T>
+): ReturnType<T>[0] {
+  const [result, err] = fn(...args);
+  if (err) {
+    throw err;
+  }
+  return result;
+}
+
+// resetGame resets the game to the initial state.
+export const resetGame = () => unwrapCall(window.__Scouts.resetGame);
+
+// boardPieces returns the pieces on the board.
+export const boardPieces = () => unwrapCall(window.__Scouts.boardPieces);
+
+// pastTurns returns the past turns.
+export const pastTurns = () => unwrapCall(window.__Scouts.pastTurns);
+
+// currentTurn returns the current turn.
+export const currentTurn = () => unwrapCall(window.__Scouts.currentTurn);
+
+// makeMove makes a move for the player. If the move is invalid, an error is
+// thrown.
+export const makeMove = (player: Player, move: Move) =>
+  unwrapCall(window.__Scouts.makeMove, player, move);
+
+// possibleMoves returns the possible moves for the player.
+export const possibleMoves = (player: Player) => unwrapCall(window.__Scouts.possibleMoves, player);
 
 // Player is the type for the player. There can only be two players.
 export type Player = 1 | 2;
@@ -77,7 +100,7 @@ export type Piece =
 function waitForScouts(): Promise<void> {
   return new Promise<void>((resolve) => {
     const interval = setInterval(() => {
-      if (window["Scouts"]) {
+      if (window["__Scouts"]) {
         clearInterval(interval);
         resolve();
       }

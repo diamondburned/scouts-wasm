@@ -7,31 +7,29 @@ import (
 	"syscall/js"
 )
 
-func promisify(fn func(js.Value, []js.Value) (js.Value, error)) js.Func {
+func fn2ReturnTuple(fn func(js.Value, []js.Value) (js.Value, error)) js.Func {
+	fnx := func(this js.Value, args []js.Value) (result, errorValue js.Value) {
+		defer func() {
+			if err := recover(); err != nil {
+				errorValue = js.Global().Get("Error").New(fmt.Sprintf(
+					"panic occured: %v\nstack: %s", err, string(debug.Stack()),
+				))
+			}
+		}()
+
+		result, err := fn(this, args)
+		if err != nil {
+			errorValue = js.Global().Get("Error").New(err.Error())
+		} else {
+			errorValue = js.Undefined()
+		}
+
+		return
+	}
+
 	return js.FuncOf(func(this js.Value, args []js.Value) any {
-		handler := js.FuncOf(func(_ js.Value, promiseArgs []js.Value) any {
-			resolve := promiseArgs[0]
-			reject := promiseArgs[1]
-			go func() {
-				defer func() {
-					if err := recover(); err != nil {
-						jsError := js.Global().Get("Error").New(fmt.Sprintf(
-							"panic occured: %v\nstack: %s", err, string(debug.Stack()),
-						))
-						reject.Invoke(jsError)
-					}
-				}()
-				result, err := fn(this, args)
-				if err != nil {
-					jsError := js.Global().Get("Error").New(err.Error())
-					reject.Invoke(jsError)
-				} else {
-					resolve.Invoke(result)
-				}
-			}()
-			return nil
-		})
-		return js.Global().Get("Promise").New(handler)
+		result, errorValue := fnx(this, args)
+		return js.ValueOf([]any{result, errorValue})
 	})
 }
 

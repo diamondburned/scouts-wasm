@@ -11,13 +11,13 @@ import (
 var game *scouts.Game
 
 func main() {
-	js.Global().Set("Scouts", map[string]any{
-		"resetGame":     promisify(resetGame),
-		"boardPieces":   promisify(boardPieces),
-		"pastTurns":     promisify(pastTurns),
-		"currentTurn":   promisify(currentTurn),
-		"makeMove":      promisify(makeMove),
-		"possibleMoves": promisify(possibleMoves),
+	js.Global().Set("__Scouts", map[string]any{
+		"resetGame":     fn2ReturnTuple(resetGame),
+		"boardPieces":   fn2ReturnTuple(boardPieces),
+		"pastTurns":     fn2ReturnTuple(pastTurns),
+		"currentTurn":   fn2ReturnTuple(currentTurn),
+		"makeMove":      fn2ReturnTuple(makeMove),
+		"possibleMoves": fn2ReturnTuple(possibleMoves),
 	})
 	// Block forever
 	select {}
