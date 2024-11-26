@@ -1,7 +1,9 @@
 module libdb.so/scouts-wasm
 
-go 1.21.5
+go 1.22.0
 
-require libdb.so/scouts-server v0.0.0-20231218082506-35523f857b22
+toolchain go1.23.2
 
-require golang.org/x/exp v0.0.0-20230626212559-97b1e661b5df // indirect
+require libdb.so/scouts-server v0.0.0-20241126025243-8ed97ff7f74a
+
+require golang.org/x/exp v0.0.0-20241108190413-2d47ceb2692f // indirect

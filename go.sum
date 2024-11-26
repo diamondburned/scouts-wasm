@@ -1,8 +1,4 @@
-golang.org/x/exp v0.0.0-20230626212559-97b1e661b5df h1:UA2aFVmmsIlefxMk29Dp2juaUSth8Pyn3Tq5Y5mJGME=
-golang.org/x/exp v0.0.0-20230626212559-97b1e661b5df/go.mod h1:FXUEEKJgO7OQYeo8N01OfiKP8RXMtf6e8aTskBGqWdc=
-libdb.so/scouts-server v0.0.0-20231216141957-cae8d03fa425 h1:oa1ajU2XGuV9VAHibWIUC9nj0BGfZfPMSJmURdbpxIU=
-libdb.so/scouts-server v0.0.0-20231216141957-cae8d03fa425/go.mod h1:fATJwW4DqJaskR9c3xL8MB9OnBBKeZsvqzQ0jd/JsHM=
-libdb.so/scouts-server v0.0.0-20231217144238-f56459d69e9e h1:lFPVqBcPhcmqaI1Q7H7sBTq2yMJ9tEvclG+s3ePe3qk=
-libdb.so/scouts-server v0.0.0-20231217144238-f56459d69e9e/go.mod h1:fATJwW4DqJaskR9c3xL8MB9OnBBKeZsvqzQ0jd/JsHM=
-libdb.so/scouts-server v0.0.0-20231218082506-35523f857b22 h1:Z09Aj+W8VdgTDk5Qcikl9CFmrHzutkYmbs0ZveP29b4=
-libdb.so/scouts-server v0.0.0-20231218082506-35523f857b22/go.mod h1:fATJwW4DqJaskR9c3xL8MB9OnBBKeZsvqzQ0jd/JsHM=
+golang.org/x/exp v0.0.0-20241108190413-2d47ceb2692f h1:XdNn9LlyWAhLVp6P/i8QYBW+hlyhrhei9uErw2B5GJo=
+golang.org/x/exp v0.0.0-20241108190413-2d47ceb2692f/go.mod h1:D5SMRVC3C2/4+F/DB1wZsLRnSNimn2Sp/NPsCrsv8ak=
+libdb.so/scouts-server v0.0.0-20241126025243-8ed97ff7f74a h1:tBzan+5fgXwizyuAS7Tu4TsIC6xJBssS4ntR5sTTZts=
+libdb.so/scouts-server v0.0.0-20241126025243-8ed97ff7f74a/go.mod h1:Pjhgr+muWZqb3WJmQcKQUOI3gxvBhQh1kdnOSmoNEso=
